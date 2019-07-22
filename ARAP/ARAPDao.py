@@ -5,7 +5,7 @@ import uuid
 from utils.DBHelper import MyHelper
 
 
-class RARPDao:
+class ARAPDao:
 
     # 应支出
     @classmethod
@@ -13,7 +13,7 @@ class RARPDao:
         result = []
         for row in data:
             res = {'supplierId': row[0], 'purchaseId': row[1], 'total': row[2], 'reason': row[3],
-                   'date': row[4]}
+                   'date': row[4], 'remain': None}
             result.append(res)
         return result
 
@@ -31,14 +31,29 @@ class RARPDao:
             "values (%s,%s,%s,%s,%s,%s)",
             [rows[0][0], purchaseId, total, reason, rows[0][4], rows[0][1]])
 
-    def query_purchase_pay(self, purchaseId):
+    def query_purchase_pay(self, purchaseId, days):
         _param = []
-        _sql = "select * from PurchasePayment "
+        _sql = "select * from PurchasePayment where 1 = 1 "
         if purchaseId:
-            _sql += " where purchaseId = %s"
+            _sql += " and purchaseId = %s"
             _param.append(purchaseId)
+        if days:
+            delta = datetime.timedelta(days=days)
+            _date = datetime.datetime.now() - delta
+            _sql += " and date >= %s"
+            _param.append(_date)
         connection = MyHelper()
         return connection.executeQuery(_sql, _param)
+
+    def query_purchase_pay_remain(self, purchaseId):
+        connection = MyHelper()
+        rows = connection.executeQuery("select pay from Payment where purchaseId = %s", [purchaseId])
+        total = 0
+        for row in rows:
+            total = total + row[0]
+        rows = connection.executeQuery("select total from PurchasePayment where purchaseId = %s",
+                                       [purchaseId])
+        return rows[0][0] - total
 
     # 应收入
     @classmethod
@@ -46,7 +61,7 @@ class RARPDao:
         result = []
         for row in data:
             res = {'customerId': row[0], 'sellId': row[1], 'total': row[2], 'reason': row[3],
-                   'date': row[4]}
+                   'date': row[4], 'remain': None}
             result.append(res)
         return result
 
@@ -62,14 +77,31 @@ class RARPDao:
             "values (%s,%s,%s,%s,%s,%s)",
             [rows[0][0], sellId, total, reason, rows[0][3], rows[0][2]])
 
-    def query_sell_receive(self, sellId):
+    def query_sell_receive(self, sellId, days):
         _param = []
-        _sql = "select * from SellReceive "
+        _sql = "select * from SellReceive where 1 = 1 "
         if sellId:
-            _sql += " where sellId = %s"
+            _sql += " and sellId = %s"
             _param.append(sellId)
+        if days:
+            delta = datetime.timedelta(days=days)
+            _date = datetime.datetime.now() - delta
+            _sql += " and date >= %s"
+            _param.append(_date)
         connection = MyHelper()
         return connection.executeQuery(_sql, _param)
+
+    def query_sell_receive_remain(self, sellId):
+        connection = MyHelper()
+        # 目前收到的金额
+        rows = connection.executeQuery("select receive from Receive where sellId = %s", [sellId])
+        total = 0
+        for row in rows:
+            total = total + row[0]
+        # 期望收到的金额
+        rows = connection.executeQuery("select total from SellReceive where sellId = %s",
+                                       [sellId])
+        return rows[0][0] - total
 
     # 支出
     @classmethod
@@ -88,7 +120,7 @@ class RARPDao:
                                         " values (%s,%s,%s,%s,%s)",
                                         [id, purchaseId, amount, date, rows[0][0]])
 
-    def query_payment(self,purchaseId,days):
+    def query_payment(self, purchaseId, days):
         _param = []
         _sql = "select * from Payment where 1 = 1"
         if purchaseId:
@@ -96,7 +128,7 @@ class RARPDao:
             _param.append(purchaseId)
         if days:
             delta = datetime.timedelta(days=days)
-            _date = datetime.datetime.now()-delta
+            _date = datetime.datetime.now() - delta
             _sql += " and date >= %s"
             _param.append(_date)
         connection = MyHelper()
@@ -119,7 +151,7 @@ class RARPDao:
                                         " values (%s,%s,%s,%s,%s)",
                                         [id, sellId, amount, date, rows[0][0]])
 
-    def query_receive(self,sellId,days):
+    def query_receive(self, sellId, days):
         _param = []
         _sql = "select * from Receive where 1 = 1"
         if sellId:
@@ -132,25 +164,3 @@ class RARPDao:
             _param.append(_date)
         connection = MyHelper()
         return connection.executeQuery(_sql, _param)
-
-    def query_purchase_pay_remain(self, purchaseId):
-        connection = MyHelper()
-        rows = connection.executeQuery("select pay from Payment where purchaseId = %s", [purchaseId])
-        total = 0
-        for row in rows:
-            total = total + row[0]
-        rows = connection.executeQuery("select total from PurchasePayment where purchaseId = %s",
-                                       [purchaseId])
-        return rows[0][0] - total
-
-    def query_sell_receive_remain(self, sellId):
-        connection = MyHelper()
-        # 目前收到的金额
-        rows = connection.executeQuery("select receive from Receive where sellId = %s", [sellId])
-        total = 0
-        for row in rows:
-            total = total + row[0]
-        # 期望收到的金额
-        rows = connection.executeQuery("select total from SellReceive where sellId = %s",
-                                       [sellId])
-        return rows[0][0] - total

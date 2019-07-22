@@ -2,7 +2,7 @@ import configparser
 import datetime
 import unittest
 
-from RARPDao import RARPDao
+from ARAPDao import ARAPDao
 
 
 class MylTest(unittest.TestCase):
@@ -14,7 +14,7 @@ class MylTest(unittest.TestCase):
         print(int(port))
 
     def test2(self):
-        arap = RARPDao()
+        arap = ARAPDao()
         # row = arap.add_payment("d63190d1-cecc-3aaa-b30f-3c843469b9eb", 10,
         #                        time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
         # row = arap.add_receive("11c139c0-0f22-31f4-a880-25d30f0f1d61", 100,
@@ -31,6 +31,6 @@ class MylTest(unittest.TestCase):
         print(_time > (_time - delta))
 
     def test4(self):
-        rarp=RARPDao()
+        rarp=ARAPDao()
         res = rarp.query_receive(None,4)
         print(res)

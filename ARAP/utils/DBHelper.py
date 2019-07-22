@@ -1,6 +1,6 @@
 import pymysql
 import threading
-import configparser
+from config import MysqlConf
 
 
 class MyHelper(object):
@@ -19,15 +19,12 @@ class MyHelper(object):
 
     def connection(self):
         try:
-            config = configparser.ConfigParser()
-            config.read("../config.ini")
-
-            self.conn = pymysql.connect(host=config.get("Mysql", "host"),
-                                        port=int(config.get("Mysql", "port")),
-                                        user=config.get("Mysql", "user"),
-                                        passwd=config.get("Mysql", "password"),
-                                        db=config.get("Mysql", "db_name"),
-                                        charset=config.get("Mysql", "charset"))
+            self.conn = pymysql.connect(host=MysqlConf.host,
+                                        port=MysqlConf.port,
+                                        user=MysqlConf.user,
+                                        passwd=MysqlConf.password,
+                                        db=MysqlConf.db_name,
+                                        charset=MysqlConf.charset)
         except Exception as e:
             print(e)
         self.cls = self.conn.cursor()

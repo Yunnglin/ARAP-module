@@ -17,7 +17,7 @@ def addPayRemain(_id, _days):
     arap = ARAPDao()
     rows = arap.query_purchase_pay(_id, _days)
     remain = arap.query_purchase_pay_remain(_id)
-    res = ARAPDao().to_purchase_pay_dict(rows)
+    res = ARAPDao.to_purchase_pay_dict(rows)
     res[0]['remain'] = remain
     return res
 
@@ -26,7 +26,7 @@ def addReceiveRemain(_id, _days):
     arap = ARAPDao()
     rows = arap.query_sell_receive(_id, _days)
     remain = arap.query_sell_receive_remain(_id)
-    res = ARAPDao().to_sell_receive_dict(rows)
+    res = ARAPDao.to_sell_receive_dict(rows)
     res[0]['remain'] = remain
     return res
 
@@ -96,11 +96,69 @@ def querySellReceive():
 
 
 @app.route('/addPayment', methods=['POST'])
+def addPayment():
+    _json = request.json
+    _id = _json.get('purchaseId')
+    _amount = _json.get('amount')
+    _date = _json.get('date')
+    try:
+        arap = ARAPDao()
+        res = arap.add_payment(_id, _amount, _date)
+        if res['row'] == 1:
+            return json.dumps(return_success({'paymentId': res['id']}), cls=DecimalEncoder)
+        else:
+            return json.dumps(return_unsuccess('添加支出失败'), ensure_ascii=False)
+    except Exception as e:
+        print(e)
+        return json.dumps(return_unsuccess('添加支出失败: ' + str(e)), ensure_ascii=False)
+
+
 @app.route('/queryPayment', methods=['POST'])
+def queryPayment():
+    _json = request.json
+    _id = _json.get('purchaseId')
+    _days = _json.get('days')
+    try:
+        arap = ARAPDao()
+        res = arap.query_payment(_id, _days)
+        return json.dumps(return_success(ARAPDao.to_pay_dict(res)),
+                          cls=DecimalEncoder, ensure_ascii=False)
+    except Exception as e:
+        print(e)
+        return json.dumps(return_unsuccess('Query Error: ' + str(e)))
+
+
 @app.route('/addReceive', methods=['POST'])
+def addReceive():
+    _json = request.json
+    _id = _json.get('sellId')
+    _amount = _json.get('amount')
+    _date = _json.get('date')
+    try:
+        arap = ARAPDao()
+        res = arap.add_receive(_id, _amount, _date)
+        if res['row'] == 1:
+            return json.dumps(return_success({'receiveId': res['id']}), cls=DecimalEncoder)
+        else:
+            return json.dumps(return_unsuccess('添加收入失败'), ensure_ascii=False)
+    except Exception as e:
+        print(e)
+        return json.dumps(return_unsuccess('添加收入失败: ' + str(e)), ensure_ascii=False)
+
+
 @app.route('/queryReceive', methods=['POST'])
 def queryReceive():
-    pass
+    _json = request.json
+    _id = _json.get('sellId')
+    _days = _json.get('days')
+    try:
+        arap = ARAPDao()
+        res = arap.query_receive(_id, _days)
+        return json.dumps(return_success(ARAPDao.to_receive_dict(res)),
+                          cls=DecimalEncoder, ensure_ascii=False)
+    except Exception as e:
+        print(e)
+        return json.dumps(return_unsuccess('Query Error: ' + str(e)))
 
 
 if __name__ == '__main__':

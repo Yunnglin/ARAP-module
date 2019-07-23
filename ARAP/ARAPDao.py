@@ -114,11 +114,14 @@ class ARAPDao:
 
     def add_payment(self, purchaseId, amount, date):
         connection = MyHelper()
-        id = str(uuid.uuid3(uuid.NAMESPACE_OID, str(time.time())))
+        _id = str(uuid.uuid3(uuid.NAMESPACE_OID, str(time.time())))
         rows = connection.executeQuery("select companyId from Purchase where id = %s", [purchaseId])
-        return connection.executeUpdate("insert into Payment (id, purchaseId, pay, date, companyId)"
-                                        " values (%s,%s,%s,%s,%s)",
-                                        [id, purchaseId, amount, date, rows[0][0]])
+        row = connection.executeUpdate("insert into Payment (id, purchaseId, pay, date, companyId)"
+                                       " values (%s,%s,%s,%s,%s)",
+                                       [_id, purchaseId, amount, date, rows[0][0]])
+
+        res = {"row": row, "id": _id.__str__()}
+        return res
 
     def query_payment(self, purchaseId, days):
         _param = []
@@ -145,11 +148,13 @@ class ARAPDao:
 
     def add_receive(self, sellId, amount, date):
         connection = MyHelper()
-        id = str(uuid.uuid3(uuid.NAMESPACE_OID, str(time.time())))
+        _id = str(uuid.uuid3(uuid.NAMESPACE_OID, str(time.time())))
         rows = connection.executeQuery("select companyId from Sell where id = %s", [sellId])
-        return connection.executeUpdate("insert into Receive (id, sellId, receive, date, companyId)"
-                                        " values (%s,%s,%s,%s,%s)",
-                                        [id, sellId, amount, date, rows[0][0]])
+        row = connection.executeUpdate("insert into Receive (id, sellId, receive, date, companyId)"
+                                       " values (%s,%s,%s,%s,%s)",
+                                       [_id, sellId, amount, date, rows[0][0]])
+        res = {"row": row, "id": _id.__str__()}
+        return res
 
     def query_receive(self, sellId, days):
         _param = []

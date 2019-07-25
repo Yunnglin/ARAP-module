@@ -10,12 +10,8 @@ app = Flask(__name__)
 Swagger(app)
 
 
-@app.route('/')
+@app.route('/arap')
 def hello_world():
-    """
-
-
-        """
     return 'Hello World!'
 
 

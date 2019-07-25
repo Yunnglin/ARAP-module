@@ -49,8 +49,11 @@ class ARAPDao:
         connection = MyHelper()
         rows = connection.executeQuery("select pay from Payment where purchaseId = %s", [purchaseId])
         total = 0
-        for row in rows:
-            total = total + row[0]
+        if len(rows) == 0:
+            pass
+        else:
+            for row in rows:
+                total = total + row[0]
         rows = connection.executeQuery("select total from PurchasePayment where purchaseId = %s",
                                        [purchaseId])
         return rows[0][0] - total
@@ -96,8 +99,11 @@ class ARAPDao:
         # 目前收到的金额
         rows = connection.executeQuery("select receive from Receive where sellId = %s", [sellId])
         total = 0
-        for row in rows:
-            total = total + row[0]
+        if len(rows) == 0:
+            pass
+        else:
+            for row in rows:
+                total = total + row[0]
         # 期望收到的金额
         rows = connection.executeQuery("select total from SellReceive where sellId = %s",
                                        [sellId])

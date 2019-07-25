@@ -2,14 +2,20 @@ from flask import Flask, request
 import json
 from utils.res_json import *
 from utils.decimal_encoder import DecimalEncoder
+from flasgger import Swagger, swag_from
 
 from ARAPDao import ARAPDao
 
 app = Flask(__name__)
+Swagger(app)
 
 
 @app.route('/')
 def hello_world():
+    """
+
+
+        """
     return 'Hello World!'
 
 
@@ -17,21 +23,28 @@ def addPayRemain(_id, _days):
     arap = ARAPDao()
     rows = arap.query_purchase_pay(_id, _days)
     remain = arap.query_purchase_pay_remain(_id)
-    res = ARAPDao.to_purchase_pay_dict(rows)
-    res[0]['remain'] = remain
-    return res
+    if len(rows) >= 1:
+        res = ARAPDao.to_purchase_pay_dict(rows)
+        res[0]['remain'] = remain
+        return res
+    else:
+        return False
 
 
 def addReceiveRemain(_id, _days):
     arap = ARAPDao()
     rows = arap.query_sell_receive(_id, _days)
     remain = arap.query_sell_receive_remain(_id)
-    res = ARAPDao.to_sell_receive_dict(rows)
-    res[0]['remain'] = remain
-    return res
+    if len(rows) >= 1:
+        res = ARAPDao.to_sell_receive_dict(rows)
+        res[0]['remain'] = remain
+        return res
+    else:
+        return False
 
 
 @app.route('/addPurchasePay', methods=['POST'])
+@swag_from('api.yml')
 def addPurchasePay():
     _json = request.json
     _purchaseId = _json.get('purchaseId')
@@ -56,8 +69,11 @@ def queryPurchasePay():
     _days = _json.get('days')
     try:
         res = addPayRemain(_purchaseId, _days)
-        return json.dumps(return_success(res),
-                          cls=DecimalEncoder, ensure_ascii=False)
+        if res:
+            return json.dumps(return_success(res),
+                              cls=DecimalEncoder, ensure_ascii=False)
+        else:
+            return json.dumps(return_unsuccess('未查询到相关数据'), ensure_ascii=False)
     except Exception as e:
         print(e)
         return json.dumps(return_unsuccess('Query Error: ' + str(e)))
@@ -88,8 +104,11 @@ def querySellReceive():
     _days = _json.get('days')
     try:
         res = addReceiveRemain(_id, _days)
-        return json.dumps(return_success(res),
-                          cls=DecimalEncoder, ensure_ascii=False)
+        if res:
+            return json.dumps(return_success(res),
+                              cls=DecimalEncoder, ensure_ascii=False)
+        else:
+            return json.dumps(return_unsuccess("No related data"))
     except Exception as e:
         print(e)
         return json.dumps(return_unsuccess('Query Error: ' + str(e)))

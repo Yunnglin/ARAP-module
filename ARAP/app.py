@@ -10,9 +10,9 @@ app = Flask(__name__)
 Swagger(app)
 
 
-@app.route('/arap')
+@app.route('/')
 def hello_world():
-    return 'Hello World!'
+    return '<h1>Hello ARAP(Account Receive Account Payment)!</h1>'
 
 
 # def addPayRemain(_id, _days):

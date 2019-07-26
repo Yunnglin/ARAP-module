@@ -13,7 +13,7 @@ class ARAPDao:
         result = []
         for row in data:
             res = {'supplierId': row[0], 'purchaseId': row[1], 'total': row[2], 'reason': row[3],
-                   'date': row[4], 'remain': None}
+                   'date': row[4], 'remain': row[5]}
             result.append(res)
         return result
 
@@ -43,7 +43,14 @@ class ARAPDao:
             _sql += " and date >= %s"
             _param.append(_date)
         connection = MyHelper()
-        return connection.executeQuery(_sql, _param)
+        rows = connection.executeQuery(_sql, _param)
+        res = []
+        for row in rows:
+            remain = self.query_purchase_pay_remain(row[1])
+            lis = list(row)
+            lis.append(remain)
+            res.append(lis)
+        return res
 
     def query_purchase_pay_remain(self, purchaseId):
         connection = MyHelper()
@@ -64,7 +71,7 @@ class ARAPDao:
         result = []
         for row in data:
             res = {'customerId': row[0], 'sellId': row[1], 'total': row[2], 'reason': row[3],
-                   'date': row[4], 'remain': None}
+                   'date': row[4], 'remain': row[5]}
             result.append(res)
         return result
 
@@ -92,7 +99,14 @@ class ARAPDao:
             _sql += " and date >= %s"
             _param.append(_date)
         connection = MyHelper()
-        return connection.executeQuery(_sql, _param)
+        rows = connection.executeQuery(_sql, _param)
+        res =[]
+        for row in rows:
+            remain = self.query_sell_receive_remain(row[1])
+            lis = list(row)
+            lis.append(remain)
+            res.append(lis)
+        return res
 
     def query_sell_receive_remain(self, sellId):
         connection = MyHelper()

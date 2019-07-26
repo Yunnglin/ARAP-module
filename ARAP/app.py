@@ -15,28 +15,31 @@ def hello_world():
     return 'Hello World!'
 
 
-def addPayRemain(_id, _days):
-    arap = ARAPDao()
-    rows = arap.query_purchase_pay(_id, _days)
-    remain = arap.query_purchase_pay_remain(_id)
-    if len(rows) >= 1:
-        res = ARAPDao.to_purchase_pay_dict(rows)
-        res[0]['remain'] = remain
-        return res
-    else:
-        return False
+# def addPayRemain(_id, _days):
+#     arap = ARAPDao()
+#     rows = arap.query_purchase_pay(_id, _days)
+#     remain = arap.query_purchase_pay_remain(_id)
+#     if len(rows) >= 1:
+#         res = ARAPDao.to_purchase_pay_dict(rows)
+#         res[0]['remain'] = remain
+#         return res
+#     else:
+#         return False
 
 
-def addReceiveRemain(_id, _days):
-    arap = ARAPDao()
-    rows = arap.query_sell_receive(_id, _days)
-    remain = arap.query_sell_receive_remain(_id)
-    if len(rows) >= 1:
-        res = ARAPDao.to_sell_receive_dict(rows)
-        res[0]['remain'] = remain
-        return res
-    else:
-        return False
+# def addReceiveRemain(_id, _days):
+#     arap = ARAPDao()
+#     rows = arap.query_sell_receive(_id, _days)
+#     print(rows)
+#     # remain = arap.query_sell_receive_remain(_id)
+#     if len(rows) >= 1:
+#         res = []
+#         for row in rows:
+#             res.append(ARAPDao.to_sell_receive_dict(row))
+#             row['remain'] = arap.query_sell_receive_remain(row[1])
+#         return res
+#     else:
+#         return False
 
 
 @app.route('/addPurchasePay', methods=['POST'])
@@ -64,9 +67,10 @@ def queryPurchasePay():
     _purchaseId = _json.get('purchaseId')
     _days = _json.get('days')
     try:
-        res = addPayRemain(_purchaseId, _days)
+        arap = ARAPDao()
+        res = arap.query_purchase_pay(_purchaseId, _days)
         if res:
-            return json.dumps(return_success(res),
+            return json.dumps(return_success(ARAPDao.to_purchase_pay_dict(res)),
                               cls=DecimalEncoder, ensure_ascii=False)
         else:
             return json.dumps(return_unsuccess('未查询到相关数据'), ensure_ascii=False)
@@ -99,9 +103,10 @@ def querySellReceive():
     _id = _json.get('sellId')
     _days = _json.get('days')
     try:
-        res = addReceiveRemain(_id, _days)
+        arap = ARAPDao()
+        res = arap.query_sell_receive(_id, _days)
         if res:
-            return json.dumps(return_success(res),
+            return json.dumps(return_success(ARAPDao.to_sell_receive_dict(res)),
                               cls=DecimalEncoder, ensure_ascii=False)
         else:
             return json.dumps(return_unsuccess("No related data"))

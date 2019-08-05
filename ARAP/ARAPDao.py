@@ -13,7 +13,7 @@ class ARAPDao:
         result = []
         for row in data:
             res = {'supplierId': row[0], 'purchaseId': row[1], 'total': row[2], 'reason': row[3],
-                   'date': row[4], 'remain': row[5]}
+                   'date': row[4], 'companyId': row[5], 'remain': row[6]}
             result.append(res)
         return result
 
@@ -72,7 +72,7 @@ class ARAPDao:
         result = []
         for row in data:
             res = {'customerId': row[0], 'sellId': row[1], 'total': row[2], 'reason': row[3],
-                   'date': row[4], 'remain': row[5]}
+                   'date': row[4], 'companyId': row[5], 'remain': row[6]}
             result.append(res)
         return result
 
@@ -102,7 +102,7 @@ class ARAPDao:
         _sql += ' order by date DESC'
         connection = MyHelper()
         rows = connection.executeQuery(_sql, _param)
-        res =[]
+        res = []
         for row in rows:
             remain = self.query_sell_receive_remain(row[1])
             lis = list(row)

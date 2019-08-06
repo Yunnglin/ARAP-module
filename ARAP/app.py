@@ -136,16 +136,30 @@ def addPayment():
 @app.route('/queryPayment', methods=['POST'])
 def queryPayment():
     _json = request.json
-    _id = _json.get('purchaseId')
+    _id = _json.get('id')
+    _purchaseId = _json.get('purchaseId')
     _days = _json.get('days')
     try:
         arap = ARAPDao()
-        res = arap.query_payment(_id, _days)
+        res = arap.query_payment(_id, _purchaseId, _days)
         return json.dumps(return_success(ARAPDao.to_pay_dict(res)),
                           cls=DecimalEncoder, ensure_ascii=False)
     except Exception as e:
         print(e)
         return json.dumps(return_unsuccess('Query Error: ' + str(e)))
+
+
+@app.route('/checkPayment', methods=['POST'])
+def checkPayment():
+    _id = request.json.get('id')
+    try:
+        arap = ARAPDao()
+        arap.check_payment(_id)
+        return json.dumps(return_success('ok'),
+                          cls=DecimalEncoder, ensure_ascii=False)
+    except Exception as e:
+        print(e)
+        return json.dumps(return_unsuccess('Check Error: ' + str(e)))
 
 
 @app.route('/addReceive', methods=['POST'])
@@ -169,16 +183,28 @@ def addReceive():
 @app.route('/queryReceive', methods=['POST'])
 def queryReceive():
     _json = request.json
-    _id = _json.get('sellId')
+    _id = _json.get('id')
+    _sellId = _json.get('sellId')
     _days = _json.get('days')
     try:
         arap = ARAPDao()
-        res = arap.query_receive(_id, _days)
+        res = arap.query_receive(_id, _sellId, _days)
         return json.dumps(return_success(ARAPDao.to_receive_dict(res)),
                           cls=DecimalEncoder, ensure_ascii=False)
     except Exception as e:
-        print(e)
         return json.dumps(return_unsuccess('Query Error: ' + str(e)))
+
+
+@app.route('/checkReceive', methods=['POST'])
+def checkReceive():
+    _id = request.json.get('id')
+    try:
+        arap = ARAPDao()
+        arap.check_receive(_id)
+        return json.dumps(return_success('ok'),
+                          cls=DecimalEncoder, ensure_ascii=False)
+    except Exception as e:
+        return json.dumps(return_unsuccess('Check Error: ' + str(e)))
 
 
 if __name__ == '__main__':

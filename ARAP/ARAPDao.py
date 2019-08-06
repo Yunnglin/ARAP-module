@@ -130,7 +130,7 @@ class ARAPDao:
     def to_pay_dict(cls, data):
         result = []
         for row in data:
-            res = {'id': row[0], 'purchaseId': row[1], 'pay': row[2], 'date': row[3]}
+            res = {'id': row[0], 'purchaseId': row[1], 'pay': row[2], 'date': row[3], 'status': row[5]}
             result.append(res)
         return result
 
@@ -145,9 +145,14 @@ class ARAPDao:
         res = {"row": row, "id": _id.__str__()}
         return res
 
-    def query_payment(self, purchaseId, days):
+    def query_payment(self, _id, purchaseId, days):
         _param = []
         _sql = "select * from Payment where 1 = 1"
+        if _id:
+            _sql += " and id = %s"
+            _param.append(_id)
+            connection = MyHelper()
+            return connection.executeQuery(_sql, _param)
         if purchaseId:
             _sql += " and purchaseId = %s"
             _param.append(purchaseId)
@@ -160,12 +165,16 @@ class ARAPDao:
         connection = MyHelper()
         return connection.executeQuery(_sql, _param)
 
-    # 收到
+    def check_payment(self, _id):
+        connection = MyHelper()
+        return connection.executeUpdate("update Payment set status = 1 where id=%s", [_id])
+
+    # 收到 Receive
     @classmethod
     def to_receive_dict(cls, data):
         result = []
         for row in data:
-            res = {'id': row[0], 'sellId': row[1], 'receive': row[2], 'date': row[3]}
+            res = {'id': row[0], 'sellId': row[1], 'receive': row[2], 'date': row[3], 'status': row[5]}
             result.append(res)
         return result
 
@@ -179,9 +188,14 @@ class ARAPDao:
         res = {"row": row, "id": _id.__str__()}
         return res
 
-    def query_receive(self, sellId, days):
+    def query_receive(self, _id, sellId, days):
         _param = []
         _sql = "select * from Receive where 1 = 1"
+        if _id:
+            _sql += " and id = %s"
+            _param.append(_id)
+            connection = MyHelper()
+            return connection.executeQuery(_sql, _param)
         if sellId:
             _sql += " and purchaseId = %s"
             _param.append(sellId)
@@ -193,3 +207,7 @@ class ARAPDao:
         _sql += ' order by date DESC'
         connection = MyHelper()
         return connection.executeQuery(_sql, _param)
+
+    def check_receive(self, _id):
+        connection = MyHelper()
+        return connection.executeUpdate("update Receive set status = 1 where id=%s", [_id])

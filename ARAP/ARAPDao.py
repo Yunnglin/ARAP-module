@@ -39,9 +39,11 @@ class ARAPDao:
             _param.append(purchaseId)
         if days:
             delta = datetime.timedelta(days=days)
-            _date = datetime.datetime.now() - delta
-            _sql += " and date >= %s"
+            now = datetime.datetime.now()
+            _date = now - delta
+            _sql += " and date >= %s and date <=%s"
             _param.append(_date)
+            _param.append(now)
         _sql += ' order by date DESC'
         connection = MyHelper()
         rows = connection.executeQuery(_sql, _param)
@@ -96,9 +98,11 @@ class ARAPDao:
             _param.append(sellId)
         if days:
             delta = datetime.timedelta(days=days)
-            _date = datetime.datetime.now() - delta
-            _sql += " and date >= %s"
+            now = datetime.datetime.now()
+            _date = now - delta
+            _sql += " and date >= %s and date <=%s"
             _param.append(_date)
+            _param.append(now)
         _sql += ' order by date DESC'
         connection = MyHelper()
         rows = connection.executeQuery(_sql, _param)
@@ -158,9 +162,11 @@ class ARAPDao:
             _param.append(purchaseId)
         if days:
             delta = datetime.timedelta(days=days)
-            _date = datetime.datetime.now() - delta
-            _sql += " and date >= %s"
+            now = datetime.datetime.now()
+            _date = now - delta
+            _sql += " and date >= %s and date <=%s"
             _param.append(_date)
+            _param.append(now)
         _sql += ' order by date DESC'
         connection = MyHelper()
         return connection.executeQuery(_sql, _param)
@@ -201,9 +207,11 @@ class ARAPDao:
             _param.append(sellId)
         if days:
             delta = datetime.timedelta(days=days)
-            _date = datetime.datetime.now() - delta
-            _sql += " and date >= %s"
+            now = datetime.datetime.now()
+            _date = now - delta
+            _sql += " and date >= %s and date <=%s"
             _param.append(_date)
+            _param.append(now)
         _sql += ' order by date DESC'
         connection = MyHelper()
         return connection.executeQuery(_sql, _param)

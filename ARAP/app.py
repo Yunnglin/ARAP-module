@@ -9,6 +9,17 @@ app = Flask(__name__)
 Swagger(app)
 
 
+@app.after_request
+def after_request(response):
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    if request.method == 'OPTIONS':
+        response.headers['Access-Control-Allow-Methods'] = 'DELETE, GET, POST, PUT'
+        headers = request.headers.get('Access-Control-Request-Headers')
+        if headers:
+            response.headers['Access-Control-Allow-Headers'] = headers
+    return response
+
+
 @app.route('/')
 def hello_world():
     return '<h1>Hello ARAP(Account Receive Account Payment)!</h1>'
